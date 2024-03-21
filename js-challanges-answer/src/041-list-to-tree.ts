@@ -17,24 +17,68 @@ const data = [
     { id: 15, name: '部门15', pid: 14 },
 ]
 
-const toTree = (list: any[]) => {
-    const res: any[] = [];
-    const temp = {};
+const list = [
+    { id: 2, name: '部门2', pid: 1 },
+    { id: 1, name: '部门1' },
+    { id: 3, name: '部门3', pid: 2 }
+];
 
-    list.forEach((item) => {
-        item.children = item.children || [];
-        temp[item.id] = item;
+// 两遍遍历
+const toTree = (list: any[]) => {
+    const res: any[] = []
+    const temp = {}
+
+    list.forEach(item => {
+        item.children = item.children || []
+        temp[item.id] = item
     })
 
-    list.forEach((item) => {
-        if(temp[item.pid]){
-            temp[item.pid].children.push(item);
+    list.forEach(item => {
+        if(typeof item.pid === 'number') {
+            temp[item.pid].children.push(item)
         } else {
             res.push(item)
         }
     })
 
-    return res;
+
+    return res
 }
 
-console.log(toTree(data))
+// 一遍遍历
+const toTree2 = (list: any[]) => {
+    const res: any = []
+    const map = {}
+
+
+    list.forEach(item => {
+        if(!map[item.id]) {
+            map[item.id] = {...item, children: []}
+        } else {
+            // 这里要处理下找到了，因为可能作为父节点，在之前被初始化了下
+            map[item.id] = {...map[item.id], ...item}
+        }
+
+        const treeItem = map[item.id]
+
+        if(typeof item.pid === 'number') {
+            // 在缓存中先找下
+            const parent = map[item.pid]
+            if(!parent) {
+                // 没有找到，没关系，先把子元素记上再说
+                map[item.pid] = {
+                    children: [treeItem]
+                }
+            } else {
+                parent.children.push(treeItem);
+            }
+        }else {
+            res.push(treeItem)
+        }
+
+    })
+
+    return res
+}
+
+console.log(JSON.stringify(toTree2(list)))

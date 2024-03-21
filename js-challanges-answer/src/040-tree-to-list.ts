@@ -50,22 +50,43 @@ const data = [
 ]
 
 
-const toList = (tree: any[]) => {
-    const res: any[] = [];
+function treeToList(data: any[]) {
+    let res: any[] = [];
 
-    const dfs = (treeItem: any[]) => {
-        treeItem.forEach((item) => {
-            const {children, ...rest} = item;
-            res.push(rest);
-            if (children) {
-                dfs(children);
+    const dfs = (tree: any[]) => {
+        tree.forEach(node => {
+            const {children, ...item} = node
+            res.push(item)
+            if(children && children.length) {
+                dfs(children)
             }
         })
     }
 
-    dfs(tree)
+    dfs(data)
 
     return res;
 }
 
-console.log(toList(data))
+const treeToList2 = (data: any[]) => {
+    const res: any[] = []
+    const queue: any[] = data || []
+
+    while (queue.length) {
+        const size = queue.length
+        for(let i = 0; i < size; i++) {
+            const node = queue.shift()
+            const {children, ...item} = node
+            res.push(item)
+            if(children?.length) {
+                queue.push(...children)
+            }
+        }
+    }
+
+    return res
+}
+
+
+console.log(treeToList(data))
+console.log(treeToList2(data))

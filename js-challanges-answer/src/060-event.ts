@@ -34,3 +34,46 @@ class EventEmitter {
         }
     }
 }
+
+
+class EventEmitter2 {
+    listeners = {}
+
+    on(event, cb) {
+        if(!this.listeners[event]) {
+            this.listeners[event] = []
+        }
+        this.listeners[event].push(cb)
+    }
+
+    once(event, cb) {
+        const cbWrap = (...args) => {
+            try{
+                cb(...args)
+            }finally {
+                this.off(event, cbWrap)
+            }
+        }
+        this.on(event, cbWrap)
+    }
+
+    emit(event, ...args) {
+        const listenersList = this.listeners[event] || []
+        listenersList.forEach((cb) => {
+            try{
+                cb(...args)
+            }catch (e) {
+                console.log(e)
+            }
+        })
+    }
+
+    off(event, cb) {
+        const listenersList = this.listeners[event] || []
+        const findIndex = listenersList.indexOf(cb)
+        if(findIndex > -1) {
+            listenersList.splice(findIndex, 1)
+        }
+    }
+
+}
